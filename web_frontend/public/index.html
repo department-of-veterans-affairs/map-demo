@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<title>Web Frontend</title>
+<script src="jquery-3.3.1.min.js"></script>
+<script src="Chart.bundle.min.js"></script>
+<!-- TBD -->
+<script src="vue.js"></script> 
+</head>
+<body>
+    <h1>Hashing Coin Miner</h1>
+
+    <canvas id="canvas" width="800" height="400"></canvas>
+    
+    <h2>
+        Current hashing speed:
+        <span id="speed">-</span>
+    </h2>
+
+    <h2>
+         Coins mined:
+        <span id="coins">-</span>
+    </h2>
+<script>
+
+String.prototype.format = function () {
+    var args = arguments;
+    return this.replace(/\{(\d+)\}/g, function (m, n) { return args[n]; });
+};
+
+var series = [];
+var xy_points = [];
+var coins = 0;
+var ctx = document.getElementById('canvas').getContext('2d');
+var graph = new Chart(ctx, {
+  type: 'line',
+  data: {
+    datasets: [{ 
+        data: xy_points,
+        label: "Hashes/Second",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: false,
+    scales: {
+            xAxes: [{
+                type: 'time',
+                distribution: 'series'
+            }]
+        }
+  }
+});
+
+function refresh () {
+    $.ajax({ url: "json" }).done(function (data) {
+        series.push(data);
+        coins = series.slice(-1)[0].coins;
+        while (series.length < 250) {
+            data = JSON.parse(JSON.stringify(data));
+            data.now -= 1;
+            series.unshift(data);
+        }
+        while (series.length > 250) {
+            series.shift();
+        }
+        while (xy_points.length > 0) {
+            xy_points.pop();
+        }
+        var speed;
+        for (var i=0; i<series.length-1; i++) {
+            // get hash speed per second
+            var s1 = series[i];
+            var s2 = series[i+1];
+            var d = new Date(0)
+            speed = (s2.hashes-s1.hashes)/(s2.now-s1.now);
+            // convert utc to localtime for display
+            d.setUTCSeconds(s2.now);
+            xy_points.push({ x: d, y: speed });
+        }
+        $("#speed").text("~" + speed.toFixed(1) + " hashes/second");
+        var msg = ("Computing " + speed.toFixed(1) + " hashes/second!");
+        $("#coins").text(coins);
+        graph.data.datasets.data = xy_points;
+        graph.update();
+    });
+}
+
+$(function () {
+    setInterval(refresh, 1000);
+});
+</script>
+
+</body>
+</html>

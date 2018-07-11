@@ -1,0 +1,39 @@
+version: "2"
+
+services:
+  # nginx web server at front end
+  # This is _TO-DO_ not implemented yet
+  web:
+    image: nginx:latest
+    ports:
+    - "8080:80"
+
+  # api backing web frontend, calls redis, rng, hash
+  api:
+    build: api
+    stdin_open: true
+    tty: true
+
+  # web frontend, calls api
+  web_frontend:
+    build: web_frontend
+    ports:
+    - "8000:80"
+    volumes:
+    - "./web_frontend/public/:/public/"
+
+  # produces a random number
+  rng_service:
+    build: rng_service
+    ports:
+    - "8001:80"
+
+  # produces a SHA hash
+  hash_service:
+    build: hash_service
+    ports:
+    - "8002:80"
+
+  # caching layer stores results
+  redis:
+    image: redis
