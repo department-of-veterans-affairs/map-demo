@@ -16,8 +16,8 @@ services:
   # web frontend, calls api
   web:
     build: web_frontend
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     volumes:
       - "./web_frontend/public/:/public/"
     depends_on:
@@ -36,16 +36,16 @@ services:
   # produces a random number
   rng_service:
     build: rng_service
-    ports:
-      - "8001:80"
+    # ports:
+    #   - "8001:80"
     networks:
       - service_nw
 
   # produces a SHA hash
   hash_service:
     build: hash_service
-    ports:
-      - "8002:80"
+    # ports:
+    #   - "8002:80"
     networks:
       - service_nw
 
