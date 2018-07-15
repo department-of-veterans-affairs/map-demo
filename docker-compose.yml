@@ -1,39 +1,66 @@
-version: "2"
+version: "3"
 
 services:
   # nginx web server at front end
-  # This is _TO-DO_ not implemented yet
-  web:
-    image: nginx:latest
+  nginx:
+    image: "nginx:latest"
     ports:
-    - "8080:80"
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+    networks:
+      - web_nw
+
+  # web frontend, calls api
+  web:
+    build: web_frontend
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./web_frontend/public/:/public/"
+    depends_on:
+      - redis
+    networks:
+      - web_nw
 
   # api backing web frontend, calls redis, rng, hash
   api:
     build: api
     stdin_open: true
     tty: true
-
-  # web frontend, calls api
-  web_frontend:
-    build: web_frontend
-    ports:
-    - "8000:80"
-    volumes:
-    - "./web_frontend/public/:/public/"
+    networks:
+      - service_nw
 
   # produces a random number
   rng_service:
     build: rng_service
     ports:
-    - "8001:80"
+      - "8001:80"
+    networks:
+      - service_nw
 
   # produces a SHA hash
   hash_service:
     build: hash_service
     ports:
-    - "8002:80"
+      - "8002:80"
+    networks:
+      - service_nw
 
   # caching layer stores results
   redis:
     image: redis
+    networks:
+      - web_nw
+      - service_nw
+
+# service network for backend services
+# web network for proxy + frontend
+# redis caching layer bridges networks
+networks:
+  service_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
