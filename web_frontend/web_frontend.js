@@ -26,8 +26,8 @@ app.get('/json', function (req, res) {
 
 app.use(express.static('public'))
 
-var server = app.listen(8000, function () {
-    console.log('web_frontend running on port 8000');
+var server = app.listen(80, function () {
+    console.log('web_frontend running on port 80');
 });
 
 module.exports = server
