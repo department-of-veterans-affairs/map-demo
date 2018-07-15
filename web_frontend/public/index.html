@@ -24,15 +24,15 @@
 <script>
 
 String.prototype.format = function () {
-    var args = arguments;
+    let args = arguments;
     return this.replace(/\{(\d+)\}/g, function (m, n) { return args[n]; });
 };
 
-var series = [];
-var xy_points = [];
-var coins = 0;
-var ctx = document.getElementById('canvas').getContext('2d');
-var graph = new Chart(ctx, {
+let series = [];
+let xy_points = [];
+let coins = 0;
+let ctx = document.getElementById('canvas').getContext('2d');
+let graph = new Chart(ctx, {
   type: 'line',
   data: {
     datasets: [{ 
@@ -69,19 +69,19 @@ function refresh () {
         while (xy_points.length > 0) {
             xy_points.pop();
         }
-        var speed;
-        for (var i=0; i<series.length-1; i++) {
+        let speed;
+        for (let i=0; i<series.length-1; i++) {
             // get hash speed per second
-            var s1 = series[i];
-            var s2 = series[i+1];
-            var d = new Date(0)
+            let s1 = series[i];
+            let s2 = series[i+1];
+            let d = new Date(0)
             speed = (s2.hashes-s1.hashes)/(s2.now-s1.now);
             // convert utc to localtime for display
             d.setUTCSeconds(s2.now);
             xy_points.push({ x: d, y: speed });
         }
         $("#speed").text("~" + speed.toFixed(1) + " hashes/second");
-        var msg = ("Computing " + speed.toFixed(1) + " hashes/second!");
+        let msg = ("Computing " + speed.toFixed(1) + " hashes/second!");
         $("#coins").text(coins);
         graph.data.datasets.data = xy_points;
         graph.update();

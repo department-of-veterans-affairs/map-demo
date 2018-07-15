@@ -30,3 +30,4 @@ var server = app.listen(80, function () {
     console.log('web_frontend running on port 80');
 });
 
+module.exports = server
