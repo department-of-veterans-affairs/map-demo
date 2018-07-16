@@ -9,7 +9,7 @@ This is a demo of an _obviously fake_ crypto coin mining application written in 
 1. install docker and docker compose
 2. clone this repo with `git clone https://github.com/department-of-veterans-affairs/map-demo.git`
 3. then build services with `docker-compose build`
-4. then run the build with `docker-compose run` 
+4. then run the build with `docker-compose up` 
 5. then access web frontend at `localhost` (standard port 80)
 6. :tada:
 
